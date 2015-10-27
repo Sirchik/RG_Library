@@ -4,7 +4,7 @@ require_relative "Order"
 require_relative "Reader"
 
 # require 'pry'
-require 'pry-byebug'
+# require 'pry-byebug'
 # require 'pry'
 
 class Library
@@ -26,7 +26,6 @@ class Library
         else
           author_name = author
           author = find_author(author_name) #exception
-          # binding.pry
           if author.nil?
             if addauthor
               author = add_author(name: author_name)
@@ -73,31 +72,25 @@ class Library
   end
 
   def add_order book:, reader:, date: Time.now()
-    if book.is_a?(String)
-      book = find_book(book) #exception
-    elsif !book.is_a?(Book)
-      fail ArgumentError, "Unknown book!"
-    end
-    if reader.is_a?(String)
-      reader = find_reader(reader) #exception
-    elsif !reader.is_a?(Reader)
-      fail ArgumentError, "Unknown reader!"
-    end
+    book = find_book(book) #exception
+    reader = find_reader(reader) #exception
     order = Order.new(book, reader, date)
     @orders << order
     order
   end
 
-  def most_reading_reader
-
+  def top_reader
+    hash = orders.inject(Hash.new(0)){|res, order| res[order.reader.to_s] += 1; res}
+    hash.max_by { |key, value| value}.first
   end
 
   def most_popular_book
-
+    books_popularity.first[0]
   end
 
   def count_reader_for_top_three_books
-
+    pop_books = books_popularity.first(3).map {|b| b[0]}
+    orders.map{|order| order.reader if pop_books.include?(order.book.to_s)}.uniq.count
   end
 
   def save_to_file file
@@ -113,8 +106,43 @@ class Library
     end
   end
 
+private
+
+  def books_popularity
+    popul_books = orders.inject(Hash.new(0)){|res, order| res[order.book.to_s] += 1; res}
+    popul_books.sort_by{|a| a[1]}.reverse
+  end
+
   def find_author name
     authors.find {|auth| auth.name == name}
+  end
+
+  def find_book book
+    if book.is_a?(String)
+      books.find {|book| book.title == book}
+    elsif book.is_a?(Book)
+      if books.include?(book)
+        book
+      else
+        fail ArgumentError, "No book in library!"
+      end
+    else
+      fail ArgumentError, "Unknown book!"
+    end
+  end
+
+  def find_reader reader
+    if reader.is_a?(String)
+      readers.find {|reader| reader.name == reader}
+    elsif reader.is_a?(Reader)
+      if readers.include?(reader)
+        reader
+      else
+        fail ArgumentError, "No reader in library!"
+      end
+    else
+      fail ArgumentError, "Unknown reader!"
+    end
   end
 
   def == other

@@ -2,7 +2,7 @@ class Reader
 
   attr_reader :name, :email, :street, :house
 
-  def initialize name, email, street, house
+  def initialize name, email = '', street = '', house = ''
     @name, @email, @street, @house = name, email, street, house
   end
 

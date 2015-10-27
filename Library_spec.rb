@@ -31,6 +31,8 @@ describe Library do
     author1 = Author.new('Author1', 'Bio')
     book = Book.new('Title', author)
     book1 = Book.new('Title1', author1)
+    reader = Reader.new('Reader')
+    reader1 = Reader.new('Reader1')
     it 'Add author' do
       
       author_lib = library1.add_author(name: 'Author', biography: 'Bio')
@@ -65,6 +67,14 @@ describe Library do
     end
 
     it 'Add book with author string not exist addauthor' do
+
+      book_lib = library1.add_book(title: 'Title1', author: 'Author1', addauthor: true)
+
+      expect(book_lib).to eq book1
+
+    end
+
+    it 'Add order' do
 
       book_lib = library1.add_book(title: 'Title1', author: 'Author1', addauthor: true)
 
